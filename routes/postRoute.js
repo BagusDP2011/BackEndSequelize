@@ -11,6 +11,7 @@ upload({
     filePrefix: "POST",
 }).single("post_image"),
 postController.postingData);
+
 router.get("/", postController.showAllData);
 // router.post("/login", postController.loginUsers)
 // router.get("/refresh-token", verifyToken, postController.refreshToken)
