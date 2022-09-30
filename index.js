@@ -13,6 +13,27 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 
+const emailer = require("./lib/emailer.js");
+const handlebars = require('handlebars')
+app.post('/email', async (req, res) => {
+  //Baca email mentah
+  const rawHTML = fs.readFileSync("templates/register_user.html", "utf-8")
+  //Compile menggunakan handlebars
+  const compileHTML = handlebars.compile(rawHTML)
+  // Kasih data yg ada di HTML
+  const result = compileHTML({
+    username: "seto"
+  })
+  await emailer({
+    to: "permainanbot@gmail.com",
+    html: result,
+    subject: "Test Email",
+    text: "Halo dunia",
+
+  })
+  res.send("Email send")
+})
+
 app.get("/users", async (req, res) => {
   try {
     const findAllUsers = await db.User.findAll({
@@ -99,7 +120,7 @@ app.get("/users/:id", async (req, res) => {
     res.status(200).json({
       message: "User Found",
       data: findUserByID,
-    });
+          });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Server Error" });
@@ -199,12 +220,15 @@ app.use("/expenses", expensesRoute)
 const authRoute = require("./routes/authRoute.js");
 app.use("/auth", authRoute)
 
+
 const postRoute = require("./routes/postRoute.js");
 app.use("/post", 
 // verifyToken,
  postRoute)
 
 app.use("/public", express.static("public"))
+
+
 
 app.listen(PORT, () => {
   db.sequelize.sync({ alter: true });

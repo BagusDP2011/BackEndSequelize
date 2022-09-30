@@ -42,11 +42,12 @@ showAllData: async (req, res) => {
           const findAllPosts = await Post.findAll({
             include: [{ model: db.User }]
           })
-        console.log(findAllPosts)
+        // console.log(findAllPosts)
+
         return res.status(200).json({
             message: "Showing Data!",
             data: findAllPosts,
-            // dataCount: findAllPosts.count,
+            dataCount: findAllPosts.count,
           });
     } catch (err) {
         console.log(err);

@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
       },
       profile_picture_url: DataTypes.STRING,
+      isVerified: {
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
+      }
     },
     {
       sequelize,

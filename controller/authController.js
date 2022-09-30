@@ -3,6 +3,10 @@ const db = require("../models");
 const bcrypt = require("bcrypt");
 const { signToken } = require("../lib/jwt");
 const { validationResult } = require("express-validator");
+const emailer = require("../lib/emailer");
+const handlebars = require('handlebars')
+const fs = require('fs');
+const { validateVerificationToken, createVerificationToken } = require("../lib/verification");
 
 const User = db.User;
 
@@ -40,9 +44,35 @@ const authController = {
         email,
         password: hashedPasword,
       });
+
+      const token = signToken({
+        id: newUser.id,
+      });
+
+      const verificationToken = createVerificationToken({
+        id: newUser.id
+      })
+      const verificationLink = `http://localhost:2000/auth/verification?verification_token=${verificationToken}`
+
+
+      const rawHTML = fs.readFileSync("templates/register_user.html", "utf-8");
+      const compileHTML = handlebars.compile(rawHTML);
+      const result = compileHTML({
+        username: username,
+        verificationLink,
+      });
+
+      await emailer({
+        to: email,
+        html: result,
+        subject: "Test Email",
+        text: "Halo dunia",
+      });
+
       return res.status(201).json({
         message: "User created!",
         data: newUser,
+        token,
       });
     } catch (err) {
       console.log(err);
@@ -125,17 +155,17 @@ const authController = {
 
       const findUserByUsernameOrEmail = await User.findOne({
         where: {
-          [Op.or]:{
+          [Op.or]: {
             username: req.body.username || "",
             email: req.body.email || "",
-          }
-        }
-      })
+          },
+        },
+      });
 
       if (findUserByUsernameOrEmail) {
         return res.status(400).json({
-          message: "Username has been taken"
-        })
+          message: "Username has been taken",
+        });
       }
       await User.update(
         { ...req.body },
@@ -146,13 +176,78 @@ const authController = {
         }
       );
 
-      const findUserByID = await User.findByPk(req.user.id)
-        return res.status(200).json({
-          message: "Edited successfully"
-        })
-
+      const findUserByID = await User.findByPk(req.user.id);
+      return res.status(200).json({
+        message: "Edited successfully",
+      });
     } catch (err) {}
   },
+  verifyUser: async (req, res) => {
+    try {
+      const { verification_token } = req.query
+      const validToken = validateVerificationToken(verification_token)
+      
+      if (!validToken){
+        res.status(401).json({
+          message: "Token invalid"
+        })
+      }
+
+      await User.update(
+        {is_verified: true}, {
+        where: {
+          id: validToken.id
+        }
+      })
+
+      //Redirect ke page tertentu
+      // return res.redirect('http://localhost:3000/login')
+      return res.status(200).json({
+        message: "User verified"
+      })
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Server error",
+      });
+    }
+  },
+  verifyUserResend: async (req, res) => {
+    try {
+      const verificationToken = createVerificationToken({
+        id: req.user.id
+      })
+      const verificationLink = `http://localhost:2000/auth/verification?verification_token=${verificationToken}`
+
+
+      const userSaatIni = await User.findByPk(req.user.id)
+      const rawHTML = fs.readFileSync("templates/register_user_resend.html", "utf-8");
+      const compileHTML = handlebars.compile(rawHTML);
+      const result = compileHTML({
+        username: userSaatIni.username,
+        verificationLink,
+      });
+      // console.log()
+
+
+      await emailer({
+        to: userSaatIni.email,
+        html: result,
+        subject: "Resend Token Email",
+        text: "Halo dunia",
+      });
+      
+
+      return res.status(200).json({
+        message: "Resend successfully"
+      })
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Server error",
+      });
+    }
+  }
 };
 
 module.exports = authController;

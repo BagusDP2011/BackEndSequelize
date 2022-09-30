@@ -20,6 +20,7 @@ router.post(
   }),
   authController.registerUser
 );
+router.get('/verification', authController.verifyUser)
 router.post("/login", authController.loginUsers);
 router.get("/refresh-token", verifyToken, authController.refreshToken);
 router.patch(
@@ -31,5 +32,10 @@ upload({
 }).single("profile_picture"),
 authController.editUserProfile
 )
+
+// Route = POST /verification
+// Untuk resend verification email (usernya harus ter login)
+// Butuh auth middleware untuk token
+router.post('/verification', verifyToken, authController.verifyUserResend)
 
 module.exports = router;
