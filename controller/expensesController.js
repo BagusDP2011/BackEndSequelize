@@ -129,10 +129,21 @@ module.exports = {
   createExpense: async (req, res) => {
     try {
       
+      // console.log(req.user)
+      const findUserByID = await db.User.findOne({
+        where: {
+          id: req.user.id,
+          },
+      });
+      console.log(findUserByID)
+      if (findUserByID.isVerified == false){
+        return res.status(401).json({
+          message:"User is not verified yet"
+        })
+      }
+
       const { amount, categoryId, userId } = req.body;
-
       const today = new Date();
-
       await db.Expense.create({
         amount,
         CategoryId: categoryId,

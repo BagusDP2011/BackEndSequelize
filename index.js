@@ -212,9 +212,8 @@ app.get("/users/register", async (req, res) => {
 });
 
 
-const expensesRoute = require ("./routes/expensesRoute")
-
 const verifyToken = require("./middllewares/authMiddleware.js");
+const expensesRoute = require ("./routes/expensesRoute")
 app.use("/expenses", expensesRoute)
 
 const authRoute = require("./routes/authRoute.js");
@@ -228,7 +227,9 @@ app.use("/post",
 
 app.use("/public", express.static("public"))
 
-
+// Buat route /transaction
+const transactionRoute = require("./routes/transactionRoute.js");
+app.use("/transaction", transactionRoute)
 
 app.listen(PORT, () => {
   db.sequelize.sync({ alter: true });

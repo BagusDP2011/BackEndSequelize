@@ -5,18 +5,16 @@ const Post = db.Post;
 
 const postController = {
   postingData: async (req, res) => {
-
     try {
       const { body } = req.body;
-      const image_url = `http://localhost:2000/public/${req.file.filename}`
+      const image_url = `http://localhost:2000/public/${req.file.filename}`;
       await Post.create({
         body,
         image_url,
         UserId: req.user.id,
-        username: req.user.username
-
+        username: req.user.username,
       });
-      
+
       return res.status(201).json({
         message: "Post created!",
       });
@@ -26,10 +24,10 @@ const postController = {
         message: "Server error",
       });
     }
-},
-showAllData: async (req, res) => {
+  },
+  showAllData: async (req, res) => {
     try {
-        // const { _limit = 5, _page = 1, _sortDir = "DESC" } = req.query
+      // const { _limit = 5, _page = 1, _sortDir = "DESC" } = req.query
 
       //   const findAllPosts = await Post.findAndCountAll({
       //   include: [{ model: db.User }],
@@ -39,24 +37,44 @@ showAllData: async (req, res) => {
       //     ["createdAt", _sortDir]
       //   ]
       // })
-          const findAllPosts = await Post.findAll({
-            include: [{ model: db.User }]
-          })
-        // console.log(findAllPosts)
+      const findAllPosts = await Post.findAll({
+        include: [{ model: db.User }],
+      });
+      // console.log(findAllPosts)
 
-        return res.status(200).json({
-            message: "Showing Data!",
-            data: findAllPosts,
-            dataCount: findAllPosts.count,
-          });
+      return res.status(200).json({
+        message: "Showing Data!",
+        data: findAllPosts,
+        dataCount: findAllPosts.count,
+      });
     } catch (err) {
-        console.log(err);
-        return res.status(500).json({
-          message: "Server error",
-        });
-        
+      console.log(err);
+      return res.status(500).json({
+        message: "Server error",
+      });
     }
-  }
+  },
+  showDataById: async (req, res) => {
+    try {
+      const showDataById = await Post.findAll({
+        where: {
+          UserId: req.user.id,
+        },
+        include: [{ model: db.User }],
+      });
+      // console.log(showDataById)
+
+      return res.status(200).json({
+        message: "Showing data specified this account!",
+        data: showDataById,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({
+        message: "Server error",
+      });
+    }
+  },
 };
 
 module.exports = postController;

@@ -1,6 +1,6 @@
 const express = require('express')
 const expensesController = require("../controller/expensesController.js")
-
+const verifyToken = require('../middllewares/authMiddleware')
 
 const router = express.Router()
 
@@ -11,7 +11,7 @@ const router = express.Router()
 // router.delete("/:id", employeeController.deleteEmployees);
 // router.patch("/:id", employeeController.editEmployeeById);
 
-router.post("/", expensesController.createExpense)
+router.post("/", verifyToken, expensesController.createExpense)
 router.get("/", expensesController.findAll)
 router.get("/me", expensesController.findMe)
 router.get("/total", expensesController.getTotalExpenses)

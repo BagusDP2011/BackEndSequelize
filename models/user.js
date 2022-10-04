@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       User.hasMany(models.Expense)
       User.hasMany(models.Post)
+      User.hasMany(models.Transactions)
     }
   }
   User.init(
@@ -33,12 +34,20 @@ module.exports = (sequelize, DataTypes) => {
       isVerified: {
         defaultValue: false,
         type: DataTypes.BOOLEAN,
+      },isAdmin: {
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
       }
     },
     {
       sequelize,
       modelName: "User",
-    }
+    },
+    // User.bulkCreate([
+    //   {id: 1, event_name: "NCT", price:100000}
+    //   {id: 2, event_name: "BLINK", price:150000}
+    //   {id: 3, event_name: "SNSD", price:125000}
+    // ])
   );
   return User;
 };

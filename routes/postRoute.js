@@ -13,6 +13,7 @@ upload({
 postController.postingData);
 
 router.get("/", postController.showAllData);
+router.get("/MyProfile", verifyToken, postController.showDataById);
 // router.post("/login", postController.loginUsers)
 // router.get("/refresh-token", verifyToken, postController.refreshToken)
 
