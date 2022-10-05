@@ -179,6 +179,7 @@ const authController = {
       const findUserByID = await User.findByPk(req.user.id);
       return res.status(200).json({
         message: "Edited successfully",
+        data: findUserByID,
       });
     } catch (err) {}
   },

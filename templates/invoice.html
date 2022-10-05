@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice</title>
+</head>
+
+<body style="
+      font-family: sans-serif;
+      margin: 0;
+      padding: 12px;
+      background-color: #f6f6f6;
+      width: 560px;
+    ">
+  <h1 style="text-align: center">Thanks for your order</h1>
+
+  <table style="width: 100%">
+    <tr>
+      <td>
+        <h3>Invoice</h3>
+      </td>
+      <td style="text-align: right">
+        <h3>{{invoiceDate}}</h3>
+      </td>
+    </tr>
+  </table>
+  <hr />
+  <table style="width: 100%; padding-top: 20px; padding-bottom:20px" >
+    <thead>
+      <tr>
+        <th style="text-align: left">Event Name</th>
+        <th style="text-align: center">Quantity</th>
+        <th style="text-align: right">Total Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each transactionItems}}
+      <tr>
+        <td style="text-align: left"> {{ this.event_name }}</td>
+        <td style="text-align: center"> {{ this.quantity }}</td>
+        <td style="text-align: right"> Rp. {{ this.total_price }}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <table style="width: 100%">
+    <tr>
+      <td>
+        <h2>Total</h2>
+      </td>
+      <td style="text-align: right;">
+        <h2>Rp. {{grandTotal}}</h2>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

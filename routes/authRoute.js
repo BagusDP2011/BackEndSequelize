@@ -23,6 +23,7 @@ router.post(
 router.get('/verification', authController.verifyUser)
 router.post("/login", authController.loginUsers);
 router.get("/refresh-token", verifyToken, authController.refreshToken);
+
 router.patch(
 "/me",
 verifyToken,

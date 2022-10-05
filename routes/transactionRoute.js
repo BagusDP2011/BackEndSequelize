@@ -12,5 +12,5 @@ upload({
 }).single("payment_proof_image_url"),
 transactionController.paymentItems)
 
-router.patch('/:id', transactionController.paymentStatus)
+router.patch('/:id', verifyToken, transactionController.paymentStatus)
 module.exports = router;
