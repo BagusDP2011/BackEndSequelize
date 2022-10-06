@@ -231,12 +231,46 @@ app.use("/public", express.static("public"))
 const transactionRoute = require("./routes/transactionRoute.js");
 app.use("/transaction", transactionRoute)
 
-app.listen(PORT, () => {
+app.get("/dogs/:breed", async (req, res) => {
+  try {
+    const { breed } = req.params
+
+    const cacheResult = await redisClient.get(breed)
+
+    if (cacheResult) {
+      return res.status(200).json({
+        message: "Fetch dogs API",
+        data: JSON.parse(cacheResult)
+      })
+    }
+
+    const response = await axios.get(
+      `https://dog.ceo/api/breed/${breed}/images`
+    )
+
+    await redisClient.setEx(breed, 600, JSON.stringify(response.data))
+
+    return res.status(200).json({
+      message: "Fetch dogs API",
+      data: response.data,
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      message: "Server error",
+    })
+  }
+})
+
+const redisClient = require("./lib/redis.js")
+app.listen(PORT, async () => {
   db.sequelize.sync({ alter: true });
 
   if (!fs.existsSync("public")) {
     fs.mkdirSync("public")
   }
+
+  await redisClient.connect()
 
   console.log("Listening to port: ", PORT);
 });
